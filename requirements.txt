@@ -4,3 +4,8 @@ pymongo
 ethon==0.1.2
 dnspython
 asyncio
+Flask
+gunicorn
+Jinja2
+werkzeug
+itsdangerous
