@@ -23,8 +23,6 @@ COPY . .
 RUN python3 -m pip install --no-cache-dir --upgrade pip
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-# Ensure run.sh is executable
-RUN chmod +x /app/run.sh
 
 # Command to run the bot
 CMD ["bash", "run.sh"]
