@@ -14,7 +14,7 @@ TRIGGERS = os.environ.get("TRIGGERS", "/ !").split(" ")
 BOT_TOKEN = os.environ.get('BOT_TOKEN', '7567477886:AAEbL5Smfy69KUN2lX38Wp5FIZ-sggC5JSE') #BOT Token Add
 API_ID = int(os.environ.get('API_ID', 27394279)) #Telgram Api id
 APP_HASH = os.environ.get('APP_HASH', '90a9aa4c31afa3750da5fd686c410851')# Telgram App hash  
-OWNER_ID = int(os.environ.get('OWNER_ID', 7465574522)
+OWNER_ID = int(os.environ.get('OWNER_ID', 7465574522))
 MONGO_DB = os.environ.get("MONGO_DB", 'mongodb+srv://python21java:8ZFGYMKJCqAPwsiO@filestore.f876hjv.mongodb.net/?retryWrites=true&w=majority&appName=Filestore') #MONGO DB FOR ANIME DATA
 FILES_CHANNEL = os.environ.get("FILES_CHANNEL", -1002288135729)    # Must Fill This ,Add Bot As Admin In Log Channel
 BOT_NAME = os.environ.get('BOT_NAME', 'MarinXkitagawabot')
