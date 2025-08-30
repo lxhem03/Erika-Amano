@@ -11,7 +11,8 @@ RUN echo "deb http://archive.debian.org/debian buster main contrib non-free" > /
     apt-get install -y --no-install-recommends \
         ffmpeg \
         mediainfo \
-        build-essential && \
+        build-essential \
+        git && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
