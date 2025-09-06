@@ -3,7 +3,7 @@ from Bot import TRIGGERS as trg, OWNER_ID
 import logging
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message
-from  import get_uptype, set_uptype  # Import from database.py
+from Bot.plugins.database.mongo_db import get_uptype, set_uptype  # Import from database.py
 
 # Configure logging (avoid reinitializing to prevent duplicate handlers)
 logger = logging.getLogger(__name__)
