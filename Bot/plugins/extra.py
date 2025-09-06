@@ -13,7 +13,7 @@ async def upload_type(client, message):
     user_id = message.from_user.id
 
     # Fetch user metadata from the database
-    current = await db.get_metadata(user_id)
+    current = await get_uptype(user_id)
     # Display the current metadata
     text = f"""
 ㊋ __Your current upload type is__: `{current}`**
@@ -40,9 +40,9 @@ async def uptype_callback(client, query: CallbackQuery):
 
     # Handle On/Off metadata toggle
     if data in ["on_metadata", "off_metadata"]:
-        await db.set_metadata(user_id, "document" if data == "on_metadata" else "Off")
+        await set_uptype(user_id, "video" if data == "set_media" else "document")
         # Refresh metadata display
-        current = await db.(user_id)
+        current = await get_uptype(user_id)
 
         text = f"""
 **㊋ __Your current upload type is__: `{current}`**
