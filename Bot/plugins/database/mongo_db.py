@@ -1,92 +1,181 @@
-
-from pymongo import MongoClient
-from pyrogram import Client, filters
-from pyrogram.types import Message
-
+import logging
+import asyncio
+from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo.errors import PyMongoError  # Motor uses similar exceptions
 from Bot import MONGO_DB as DB_URL, BOT_NAME, OWNER_ID
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler()]
+)
 
-
-cluster = MongoClient(DB_URL)
+# MongoDB setup for Motor
+cluster = AsyncIOMotorClient(DB_URL)
 db = cluster['Encoding']
 users = db[BOT_NAME]
-                                    
-def check_user_mdb(id):
-    got = users.find_one({'user_id':int(id)})
-    if got is not None:
-        got = int(got['user_id'])
-        return got   
 
-def check_crf_mdb(id):
-    got = users.find_one({'user_id':int(id)})
-    if got is not None:
-        got = int(got['crf'])
-        return got    
+async def check_user_mdb(user_id: int) -> int | None:
+    try:
+        got = await users.find_one({'user_id': int(user_id)})
+        if got is not None:
+            return int(got['user_id'])
+        return None
+    except PyMongoError as e:
+        logging.error(f"Error checking user {user_id}: {e}")
+        raise
 
-def check_resolution_settings(id):
-    got = users.find_one({'user_id':int(id)})
-    if got is not None:
-        got = got['resolution']
-        return got
-    
-def check_preset_settings(id):
-    got = users.find_one({'user_id':int(id)})
-    if got is not None:
-        got = got['preset']
-        return got    
-    
-def check_vcodec_settings(id):
-    got = users.find_one({'user_id':int(id)})
-    if got is not None:
-        got = got['vcodec']
-        return got    
-    
-def check_audio_type_mdb(id):
-    got = users.find_one({'user_id':int(id)})
-    if got is not None:
-        got = str(got['audio_type'])
-        return got    
-    
-def update_resolution_settings(id, new):
-    got = users.update_one({'user_id':int(id)}, {'$set':{'resolution':new}}) 
-    if got is not None:
-        return 'Success' 
+async def check_crf_mdb(user_id: int) -> int | None:
+    try:
+        got = await users.find_one({'user_id': int(user_id)})
+        if got is not None:
+            return int(got.get('crf', 30))  
+        return None
+    except PyMongoError as e:
+        logging.error(f"Error fetching CRF for user {user_id}: {e}")
+        raise
 
-def update_preset_settings(id, new):
-    got = users.update_one({'user_id':int(id)}, {'$set':{'preset':new}}) 
-    if got is not None:
-        return 'Success' 
+async def check_resolution_settings(user_id: int) -> str | None:
+    try:
+        got = await users.find_one({'user_id': int(user_id)})
+        if got is not None:
+            return got.get('resolution', '480p')  
+        return None
+    except PyMongoError as e:
+        logging.error(f"Error fetching resolution for user {user_id}: {e}")
+        raise
 
-def update_vcodec_settings(id, new):
-    got = users.update_one({'user_id':int(id)}, {'$set':{'vcodec':new}}) 
-    if got is not None:
+async def check_preset_settings(user_id: int) -> str | None:
+    try:
+        got = await users.find_one({'user_id': int(user_id)})
+        if got is not None:
+            return got.get('preset', 'fast')  
+        return None
+    except PyMongoError as e:
+        logging.error(f"Error fetching preset for user {user_id}: {e}")
+        raise
+
+async def check_vcodec_settings(user_id: int) -> str | None:
+    try:
+        got = await users.find_one({'user_id': int(user_id)})
+        if got is not None:
+            return got.get('vcodec', 'x264')  
+        return None
+    except PyMongoError as e:
+        logging.error(f"Error fetching vcodec for user {user_id}: {e}")
+        raise
+
+async def check_audio_type_mdb(user_id: int) -> str | None:
+    try:
+        got = await users.find_one({'user_id': int(user_id)})
+        if got is not None:
+            return str(got.get('audio_type', 'aac')) 
+        return None
+    except PyMongoError as e:
+        logging.error(f"Error fetching audio type for user {user_id}: {e}")
+        raise
+
+async def update_resolution_settings(user_id: int, new: str) -> str:
+    try:
+        result = await users.update_one({'user_id': int(user_id)}, {'$set': {'resolution': new}})
+        if result.modified_count > 0 or result.matched_count > 0:
+            return 'Success'
+        logging.warning(f"No update performed for resolution of user {user_id}")
+        return 'Success'  # Return Success even if no update (user exists)
+    except PyMongoError as e:
+        logging.error(f"Error updating resolution for user {user_id}: {e}")
+        raise
+
+async def update_preset_settings(user_id: int, new: str) -> str:
+    try:
+        result = await users.update_one({'user_id': int(user_id)}, {'$set': {'preset': new}})
+        if result.modified_count > 0 or result.matched_count > 0:
+            return 'Success'
+        logging.warning(f"No update performed for preset of user {user_id}")
         return 'Success'
+    except PyMongoError as e:
+        logging.error(f"Error updating preset for user {user_id}: {e}")
+        raise
 
-def update_audio_type_mdb(id, new):
-    got = users.update_one({'user_id':int(id)}, {'$set':{'audio_type':new}}) 
-    if got is not None:
-        return 'Success'        
-    
-def update_crf(id, new):
-    got = users.update_one({'user_id':int(id)}, {'$set':{'crf':new}}) 
-    if got is not None:
-        return 'Success' 
-    
-def get_uptype(self, user_id):
-    user = await self.col.find_one({'_id': int(user_id)})
-    return user.get('uptype', "document")
-  
-def set_uptype(self, user_id, uptype):
-    await self.col.update_one({'_id': int(user_id)}, {'$set': {'uptype': uptype}})
+async def update_vcodec_settings(user_id: int, new: str) -> str:
+    try:
+        result = await users.update_one({'user_id': int(user_id)}, {'$set': {'vcodec': new}})
+        if result.modified_count > 0 or result.matched_count > 0:
+            return 'Success'
+        logging.warning(f"No update performed for vcodec of user {user_id}")
+        return 'Success'
+    except PyMongoError as e:
+        logging.error(f"Error updating vcodec for user {user_id}: {e}")
+        raise
 
+async def update_audio_type_mdb(user_id: int, new: str) -> str:
+    try:
+        result = await users.update_one({'user_id': int(user_id)}, {'$set': {'audio_type': new}})
+        if result.modified_count > 0 or result.matched_count > 0:
+            return 'Success'
+        logging.warning(f"No update performed for audio type of user {user_id}")
+        return 'Success'
+    except PyMongoError as e:
+        logging.error(f"Error updating audio type for user {user_id}: {e}")
+        raise
 
+async def update_crf(user_id: int, new: int) -> str:
+    try:
+        result = await users.update_one({'user_id': int(user_id)}, {'$set': {'crf': new}})
+        if result.modified_count > 0 or result.matched_count > 0:
+            return 'Success'
+        logging.warning(f"No update performed for CRF of user {user_id}")
+        return 'Success'
+    except PyMongoError as e:
+        logging.error(f"Error updating CRF for user {user_id}: {e}")
+        raise
 
-def owner_check():
-    check = check_user_mdb(OWNER_ID)
-    check2 = check_user_mdb(953362604) #DEV ID BCOZ IF YOU COME WITHOUT THIS WE CAN't HELP YOU
-    if check is None:
-        users.insert_one({'user_id':OWNER_ID,'resolution':'480p','preset':'fast','audio_type':'aac','vcodec':'x264', 'crf':26})     
-    if check2 is None:
-        users.insert_one({'user_id':953362604,'resolution':'480p','preset':'fast','audio_type':'aac','vcodec':'x264', 'crf':26})
+async def get_uptype(user_id: int) -> str:
+    try:
+        user = await users.find_one({'_id': int(user_id)})
+        return user.get('uptype', 'document') if user else 'document'
+    except PyMongoError as e:
+        logging.error(f"Error fetching uptype for user {user_id}: {e}")
+        raise
 
-owner_check()          
-       
+async def set_uptype(user_id: int, uptype: str) -> None:
+    if uptype not in ['video', 'document']:
+        logging.error(f"Invalid uptype {uptype} for user {user_id}")
+        raise ValueError(f"Invalid uptype: {uptype}")
+    try:
+        await users.update_one({'_id': int(user_id)}, {'$set': {'uptype': uptype}})
+    except PyMongoError as e:
+        logging.error(f"Error setting uptype for user {user_id}: {e}")
+        raise
+
+async def owner_check():
+    try:
+        check = await check_user_mdb(OWNER_ID)
+        check2 = await check_user_mdb(953362604)  # DEV ID
+        if check is None:
+            await users.insert_one({
+                'user_id': OWNER_ID,
+                'resolution': '480p',
+                'preset': 'fast',
+                'audio_type': 'aac',
+                'vcodec': 'x264',
+                'crf': 30,
+                'uptype': 'document'
+            })
+            logging.info(f"Initialized owner {OWNER_ID} in database")
+        if check2 is None:
+            await users.insert_one({
+                'user_id': 953362604,
+                'resolution': '480p',
+                'preset': 'fast',
+                'audio_type': 'aac',
+                'vcodec': 'x264',
+                'crf': 30,
+                'uptype': 'document'
+            })
+            logging.info(f"Initialized dev 953362604 in database")
+    except PyMongoError as e:
+        logging.error(f"Error in owner_check: {e}")
+        raise
+
+asyncio.run(owner_check())
