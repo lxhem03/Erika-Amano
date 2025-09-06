@@ -71,6 +71,12 @@ def update_crf(id, new):
     if got is not None:
         return 'Success' 
     
+def get_uptype(self, user_id):
+    user = await self.col.find_one({'_id': int(user_id)})
+    return user.get('uptype', "document")
+  
+def set_uptype(self, user_id, uptype):
+    await self.col.update_one({'_id': int(user_id)}, {'$set': {'uptype': uptype}})
 
 
 
