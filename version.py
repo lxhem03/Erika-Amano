@@ -6,21 +6,21 @@ def check_ffmpeg_version():
     try:
         result = subprocess.run(['ffmpeg', '-version'], capture_output=True, text=True, check=True)
         version_info = result.stdout.splitlines()[0]
-        print(f"FFmpeg Version:\n{version_info}\n")
+        print(f"FFmpeg Version:\n{version_info}\t")
     except FileNotFoundError:
         print("FFmpeg not found. Please ensure it's installed and in your PATH.\n")
     except subprocess.CalledProcessError as e:
         print(f"Error checking FFmpeg version:\n{e.stderr}\n")
 
 def check_python_version():
-    print(f"Python Version:\n{sys.version}\n")
+    print(f"Python Version:\t{sys.version}\t")
 
 def check_ffmpeg_codecs():
     try:
         result = subprocess.run(['ffmpeg', '-codecs'], capture_output=True, text=True, check=True)
         codecs_info = result.stdout
         #You can parse the output further if needed.
-        print("Available FFmpeg Codecs:\n")
+        print("Available FFmpeg Codecs:\t")
         print(codecs_info)
 
         # OPTIONAL: Print only the encoders to reduce the output length
