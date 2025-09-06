@@ -1,8 +1,10 @@
 import logging
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
-from pymongo.errors import PyMongoError  # Motor uses similar exceptions
+from pymongo.errors import PyMongoError
+from typing import Optional  # For Python 3.9 compatibility
 from Bot import MONGO_DB as DB_URL, BOT_NAME, OWNER_ID
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -15,7 +17,7 @@ cluster = AsyncIOMotorClient(DB_URL)
 db = cluster['Encoding']
 users = db[BOT_NAME]
 
-async def check_user_mdb(user_id: int) -> int | None:
+async def check_user_mdb(user_id: int) -> Optional[int]:
     try:
         got = await users.find_one({'user_id': int(user_id)})
         if got is not None:
@@ -25,51 +27,51 @@ async def check_user_mdb(user_id: int) -> int | None:
         logging.error(f"Error checking user {user_id}: {e}")
         raise
 
-async def check_crf_mdb(user_id: int) -> int | None:
+async def check_crf_mdb(user_id: int) -> Optional[int]:
     try:
         got = await users.find_one({'user_id': int(user_id)})
         if got is not None:
-            return int(got.get('crf', 30))  
+            return int(got.get('crf', 26))
         return None
     except PyMongoError as e:
         logging.error(f"Error fetching CRF for user {user_id}: {e}")
         raise
 
-async def check_resolution_settings(user_id: int) -> str | None:
+async def check_resolution_settings(user_id: int) -> Optional[str]:
     try:
         got = await users.find_one({'user_id': int(user_id)})
         if got is not None:
-            return got.get('resolution', '480p')  
+            return got.get('resolution', '480p')
         return None
     except PyMongoError as e:
         logging.error(f"Error fetching resolution for user {user_id}: {e}")
         raise
 
-async def check_preset_settings(user_id: int) -> str | None:
+async def check_preset_settings(user_id: int) -> Optional[str]:
     try:
         got = await users.find_one({'user_id': int(user_id)})
         if got is not None:
-            return got.get('preset', 'fast')  
+            return got.get('preset', 'fast')
         return None
     except PyMongoError as e:
         logging.error(f"Error fetching preset for user {user_id}: {e}")
         raise
 
-async def check_vcodec_settings(user_id: int) -> str | None:
+async def check_vcodec_settings(user_id: int) -> Optional[str]:
     try:
         got = await users.find_one({'user_id': int(user_id)})
         if got is not None:
-            return got.get('vcodec', 'x264')  
+            return got.get('vcodec', 'x264')
         return None
     except PyMongoError as e:
         logging.error(f"Error fetching vcodec for user {user_id}: {e}")
         raise
 
-async def check_audio_type_mdb(user_id: int) -> str | None:
+async def check_audio_type_mdb(user_id: int) -> Optional[str]:
     try:
         got = await users.find_one({'user_id': int(user_id)})
         if got is not None:
-            return str(got.get('audio_type', 'aac')) 
+            return str(got.get('audio_type', 'aac'))
         return None
     except PyMongoError as e:
         logging.error(f"Error fetching audio type for user {user_id}: {e}")
@@ -81,7 +83,7 @@ async def update_resolution_settings(user_id: int, new: str) -> str:
         if result.modified_count > 0 or result.matched_count > 0:
             return 'Success'
         logging.warning(f"No update performed for resolution of user {user_id}")
-        return 'Success'  # Return Success even if no update (user exists)
+        return 'Success'
     except PyMongoError as e:
         logging.error(f"Error updating resolution for user {user_id}: {e}")
         raise
@@ -159,7 +161,7 @@ async def owner_check():
                 'preset': 'fast',
                 'audio_type': 'aac',
                 'vcodec': 'x264',
-                'crf': 30,
+                'crf': 26,
                 'uptype': 'document'
             })
             logging.info(f"Initialized owner {OWNER_ID} in database")
@@ -170,7 +172,7 @@ async def owner_check():
                 'preset': 'fast',
                 'audio_type': 'aac',
                 'vcodec': 'x264',
-                'crf': 30,
+                'crf': 26,
                 'uptype': 'document'
             })
             logging.info(f"Initialized dev 953362604 in database")
