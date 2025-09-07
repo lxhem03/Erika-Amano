@@ -26,10 +26,10 @@ async def upload_type(client, message):
 
     try:
         # Fetch user upload type from the database
-        current = await get_uptype(user_id)
+        current = get_uptype(user_id)
         if current not in ["video", "document"]:
             logger.warning(f"Invalid uptype {current} for user {user_id}, resetting to document")
-            await set_uptype(user_id, "document")
+            set_uptype(user_id, "document")
             current = "document"
 
         # Display the current upload type
@@ -66,11 +66,11 @@ async def uptype_callback(client, query: CallbackQuery):
     try:
         # Map callback data to uptype
         uptype = "video" if data == "set_media" else "document"
-        await set_uptype(user_id, uptype)
+        set_uptype(user_id, uptype)
         logger.info(f"Set uptype to {uptype} for user {user_id}")
 
         # Refresh metadata display (keeping redundant call)
-        current = await get_uptype(user_id)
+        current = get_uptype(user_id)
 
         text = f"""
 ㊋ __Your current upload type is__: `{current.capitalize()}`
