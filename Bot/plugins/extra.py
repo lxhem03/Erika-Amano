@@ -42,11 +42,11 @@ async def upload_type(client, message):
             [
                 InlineKeyboardButton(
                     f"Document 📁{' ✓' if current == 'document' else ''}",
-                    callback_data="set_document" if current != "document" else None
+                    callback_data="set_document"
                 ),
                 InlineKeyboardButton(
                     f"Video 🎥{' ✓' if current == 'video' else ''}",
-                    callback_data="set_media" if current != "video" else None
+                    callback_data="set_media"
                 ),
             ],
         ]
@@ -81,11 +81,11 @@ async def uptype_callback(client, query: CallbackQuery):
             [
                 InlineKeyboardButton(
                     f"Document 📁{' ✓' if current == 'document' else ''}",
-                    callback_data="set_document" if current != "document" else None
+                    callback_data="set_document" 
                 ),
                 InlineKeyboardButton(
                     f"Video 🎥{' ✓' if current == 'video' else ''}",
-                    callback_data="set_media" if current != "video" else None
+                    callback_data="set_media"
                 ),
             ],
         ]
