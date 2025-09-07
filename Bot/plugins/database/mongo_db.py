@@ -180,4 +180,4 @@ async def owner_check():
         logging.error(f"Error in owner_check: {e}")
         raise
 
-asyncio.run(owner_check())
+owner_check()
