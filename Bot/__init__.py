@@ -1,5 +1,6 @@
 import os, sys, logging
 from pyrogram import Client 
+from Bot.plugins.database.mongo_db import owner_check
 
 if os.path.exists('error.log'):
     os.remove('error.log')
@@ -25,7 +26,9 @@ ubot = None  # Don't Touch This
 if BOT_TOKEN is not None:
     try:
         encoder  = Client('AutoEncoder', api_id=API_ID, api_hash=APP_HASH, bot_token=BOT_TOKEN, plugins=dict(root="Bot/plugins"))
-        LOG.info('❤️ Bot Connected Created By Github @soheru || Telegram @sohailkhan_indianime ')
+        LOG.info('❤️ Bot Connected! Checking ownership')
+        # Run owner_check on startup
+        owner_check()
     except Exception as e:
         LOG.warn(f'😞 Error While Connecting To Bot\nCheck Errors: {e}')
         sys.exit()       
