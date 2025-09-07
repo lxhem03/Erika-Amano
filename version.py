@@ -1,6 +1,7 @@
 import subprocess
 import sys
 import json
+from Bot.plugins.database.mongo_db import owner_check
 
 def check_ffmpeg_version():
     try:
@@ -42,3 +43,6 @@ if __name__ == "__main__":
     check_python_version()
     check_ffmpeg_codecs()
     print("Environment check complete.")
+    print("Starting Ownership check\n")
+    # Run owner_check on startup
+    owner_check()
