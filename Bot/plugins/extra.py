@@ -97,4 +97,4 @@ async def uptype_callback(client, query: CallbackQuery):
         logger.info(f"Updated UI with uptype {current} for user {user_id}")
     except Exception as e:
         logger.error(f"Error in uptype_callback for user {user_id}: {e}")
-        await query.answer("⚠️ Error updating upload type.", show_alert=True)
+        await query.answer(f"⚠️ Error updating upload type: {e}", show_alert=True)
